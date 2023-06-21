@@ -21,7 +21,7 @@ namespace BookRentalSystem.Controllers
         {
             if (!_unitOfWork.AuthorRepository.IfTableExists())
             {
-                return NotFound();
+                return Problem("Internal Server Error.");
             }
 
             return Ok(await _unitOfWork.AuthorRepository.GetAll());
@@ -32,7 +32,7 @@ namespace BookRentalSystem.Controllers
         {
             if (!_unitOfWork.AuthorRepository.IfTableExists())
             {
-                return NotFound();
+                return Problem("Internal Server Error.");
             }
 
             if (!await _unitOfWork.AuthorRepository.IfExists(id))
@@ -49,7 +49,7 @@ namespace BookRentalSystem.Controllers
         {
             if (!_unitOfWork.AuthorRepository.IfTableExists())
             {
-                return NotFound();
+                return Problem("Internal Server Error.");
             }
 
             var author = await _unitOfWork.AuthorRepository.AddAuthor(authorDTO);
@@ -63,7 +63,7 @@ namespace BookRentalSystem.Controllers
         {
             if (!_unitOfWork.AuthorRepository.IfTableExists())
             {
-                return NotFound();
+                return Problem("Internal Server Error.");
             }
 
             if (!await _unitOfWork.AuthorRepository.IfExists(id))
@@ -81,7 +81,7 @@ namespace BookRentalSystem.Controllers
         {
             if (!_unitOfWork.AuthorRepository.IfTableExists())
             {
-                return NotFound();
+                return Problem("Internal Server Error.");
             }
 
             if (!await _unitOfWork.AuthorRepository.IfExists(id))

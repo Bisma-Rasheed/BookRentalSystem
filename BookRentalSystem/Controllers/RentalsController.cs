@@ -22,7 +22,7 @@ namespace BookRentalSystem.Controllers
         {
             if (!_unitOfWork.RentalRepository.IfTableExists())
             {
-                return NotFound();
+                return Problem("Internal Server Error.");
             }
 
             return Ok(await _unitOfWork.RentalRepository.GetAll());
@@ -33,7 +33,7 @@ namespace BookRentalSystem.Controllers
         {
             if(!_unitOfWork.RentalRepository.IfTableExists())
             {
-                return NotFound();
+                return Problem("Internal Server Error.");
             }
 
             if(!await _unitOfWork.RentalRepository.IfExists(id))
@@ -49,7 +49,7 @@ namespace BookRentalSystem.Controllers
         {
             if (!_unitOfWork.RentalRepository.IfTableExists())
             {
-                return NotFound();
+                return Problem("Internal Server Error.");
             }
 
             var rental = await _unitOfWork.RentalRepository.AddRentalInfo(rentalDTO);
@@ -62,12 +62,14 @@ namespace BookRentalSystem.Controllers
         {
             if (!_unitOfWork.RentalRepository.IfTableExists())
             {
-                return NotFound();
+                //return StatusCode(500);
+                return Problem("Internal Server Error.");
             }
 
             if (!await _unitOfWork.RentalRepository.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
+                //throw new FileNotFoundException("No record exists with that ID bisma.");
             }
 
             await _unitOfWork.RentalRepository.UpdateRentalInfo(id, rentalDTO);
@@ -80,7 +82,7 @@ namespace BookRentalSystem.Controllers
         {
             if (!_unitOfWork.RentalRepository.IfTableExists())
             {
-                return NotFound();
+                return Problem("Internal Server Error.");
             }
 
             if (!await _unitOfWork.RentalRepository.IfExists(id))

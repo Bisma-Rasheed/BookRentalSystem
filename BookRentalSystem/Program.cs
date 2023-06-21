@@ -1,5 +1,4 @@
 using BookRentalSystem.Data;
-using BookRentalSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using BookRentalSystem.Repositories.IRepositories;
@@ -45,3 +44,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
