@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using BookRentalSystem.Models;
 using BookRentalSystem.DTO;
-using BookRentalSystem.UnitOfWork;
+using BookRentalSystem.Services.IServices;
 
 namespace BookRentalSystem.Controllers
 {
@@ -10,54 +10,54 @@ namespace BookRentalSystem.Controllers
     [ApiController]
     public class CustomersController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICustomersService _service;
 
-        public CustomersController(IUnitOfWork unitOfWork)
+        public CustomersController(ICustomersService service)
         {
-            _unitOfWork = unitOfWork;
+            _service = service;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
-            if(!_unitOfWork.CustomerRepository.IfTableExists())
+            if(!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            return Ok(await _unitOfWork.CustomerRepository.GetAll());
+            return Ok(await _service.GetAllItems());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
-            if (!_unitOfWork.CustomerRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            if (! await _unitOfWork.CustomerRepository.IfExists(id))
+            if (! await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
 
-            return Ok(await _unitOfWork.CustomerRepository.GetById(id));
+            return Ok(await _service.GetItem(id));
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult> PutCustomer(int id, CustomerDTO customerDTO)
         {
-            if (!_unitOfWork.CustomerRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            if (!await _unitOfWork.CustomerRepository.IfExists(id))
+            if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
 
-            await _unitOfWork.CustomerRepository.UpdateCustomer(id, customerDTO);
+            await _service.UpdateCustomer(id, customerDTO);
 
             return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
 
@@ -67,12 +67,12 @@ namespace BookRentalSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<CustomerDTO>> PostCustomer(CustomerDTO customerDTO)
         {
-            if (!_unitOfWork.CustomerRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            var customer = await _unitOfWork.CustomerRepository.AddCustomer(customerDTO);
+            var customer = await _service.AddCustomer(customerDTO);
 
 
             return CreatedAtAction("GetCustomer", new { id = customer.CustomerID }, customerDTO);
@@ -81,17 +81,17 @@ namespace BookRentalSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            if (!_unitOfWork.CustomerRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            if (!await _unitOfWork.CustomerRepository.IfExists(id))
+            if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }                                                                       
 
-            await _unitOfWork.CustomerRepository.RemoveItem(id);
+            await _service.Delete(id);
 
             return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
         }

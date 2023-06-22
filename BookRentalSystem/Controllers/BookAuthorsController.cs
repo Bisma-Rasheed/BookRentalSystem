@@ -2,7 +2,7 @@
 using BookRentalSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using BookRentalSystem.DTO;
-using BookRentalSystem.UnitOfWork;
+using BookRentalSystem.Services.IServices;
 
 namespace BookRentalSystem.Controllers
 {
@@ -10,50 +10,50 @@ namespace BookRentalSystem.Controllers
     [ApiController]
     public class BookAuthorsController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IBookAuthorsService _service;
 
-        public BookAuthorsController(IUnitOfWork unitOfWork)
+        public BookAuthorsController(IBookAuthorsService service)
         {
-            _unitOfWork = unitOfWork;
+            _service = service;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookAuthor>>> GetAll()
         {
-            if (!_unitOfWork.BookAuthorRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            return Ok(await _unitOfWork.BookAuthorRepository.GetAll());
+            return Ok(await _service.GetAllItems());
             
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<BookAuthor>> GetBookAuthorInfo(int id)
         {
-            if (!_unitOfWork.BookAuthorRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            if (!await _unitOfWork.BookAuthorRepository.IfExists(id))
+            if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
 
-            return Ok(await _unitOfWork.BookAuthorRepository.GetById(id));
+            return Ok(await _service.GetItem(id));
         }
 
         [HttpPost]
         public async Task<ActionResult<BookAuthor>> AddBookAuthor([FromBody] BookAuthorDTO bookAuthorDTO)
         {
-            if (!_unitOfWork.BookAuthorRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            var bAuthor = await _unitOfWork.BookAuthorRepository.AddBookAuthor(bookAuthorDTO);
+            var bAuthor = await _service.AddBookAuthor(bookAuthorDTO);
 
             return CreatedAtAction("GetBookAuthorInfo", new { id = bAuthor.BookAuthorID }, bookAuthorDTO);
         }
@@ -61,17 +61,17 @@ namespace BookRentalSystem.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBookAuthor(int id, [FromBody] BookAuthorDTO bookAuthorDTO)
         {
-            if (!_unitOfWork.BookAuthorRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return NotFound();
             }
 
-            if (!await _unitOfWork.BookAuthorRepository.IfExists(id))
+            if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
 
-            await _unitOfWork.BookAuthorRepository.UpdateBookAuthor(id, bookAuthorDTO);
+            await _service.UpdateBookAuthor(id, bookAuthorDTO);
 
             return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
         }
@@ -79,17 +79,17 @@ namespace BookRentalSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (!_unitOfWork.BookAuthorRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            if (!await _unitOfWork.BookAuthorRepository.IfExists(id))
+            if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
 
-            await _unitOfWork.BookAuthorRepository.RemoveItem(id);
+            await _service.Delete(id);
 
             return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
         }

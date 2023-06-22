@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookRentalSystem.Repositories
 {
-    public abstract class GenericRepo<T> : IGenericRepo<T> where T : class
+    public class GenericRepo<T> : IGenericRepo<T> where T : class
     {
         private readonly BRSContext _context;
         protected readonly DbSet<T> _dbSet;

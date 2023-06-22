@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using BookRentalSystem.Models;
 using BookRentalSystem.DTO;
-using BookRentalSystem.UnitOfWork;
+using BookRentalSystem.Services.IServices;
 
 namespace BookRentalSystem.Controllers
 {
@@ -10,49 +10,49 @@ namespace BookRentalSystem.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public BooksController(IUnitOfWork unitOfWork)
+        private readonly IBooksService _service;
+        public BooksController(IBooksService service)
         {
-            _unitOfWork = unitOfWork;
+            _service = service;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetAllBooks()
         {
-            if (!_unitOfWork.BookRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            return Ok(await _unitOfWork.BookRepository.GetAll());
+            return Ok(await _service.GetAllItems());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
-            if (!_unitOfWork.BookRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            if (!await _unitOfWork.BookRepository.IfExists(id))
+            if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
 
-            return Ok(await _unitOfWork.BookRepository.GetById(id));
+            return Ok(await _service.GetItem(id));
         }
 
 
         [HttpPost]
         public async Task<ActionResult<BookDTO>> AddBook([FromBody] BookDTO bookDTO)
         {
-            if (!_unitOfWork.BookRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            var book = await _unitOfWork.BookRepository.AddBook(bookDTO);
+            var book = await _service.AddBook(bookDTO);
 
             return CreatedAtAction("GetBook", new { id = book.BookID }, bookDTO);
         }
@@ -60,17 +60,17 @@ namespace BookRentalSystem.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] BookDTO bookDTO)
         {
-            if (!_unitOfWork.BookRepository.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            if (!await _unitOfWork.BookRepository.IfExists(id))
+            if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
 
-            await _unitOfWork.BookRepository.UpdateBook(id, bookDTO);
+            await _service.UpdateBook(id, bookDTO);
 
             return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
         }
@@ -78,17 +78,17 @@ namespace BookRentalSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            if (!   _unitOfWork.BookRepository.IfTableExists())
+            if (!   _service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            if (!await _unitOfWork.BookRepository.IfExists(id))
+            if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
 
-            await _unitOfWork.BookRepository.RemoveItem(id);
+            await _service.Delete(id);
 
             return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
         }
