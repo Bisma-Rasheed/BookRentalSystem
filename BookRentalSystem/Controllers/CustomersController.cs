@@ -24,8 +24,15 @@ namespace BookRentalSystem.Controllers
             {
                 return Problem("Internal Server Error.");
             }
-
-            return Ok(await _service.GetAllItems());
+            try
+            {
+                return Ok(await _service.GetAllItems());
+            }
+            catch(Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+            
         }
 
         [HttpGet("{id}")]
@@ -40,8 +47,15 @@ namespace BookRentalSystem.Controllers
             {
                 return NotFound("No record exists with that ID.");
             }
-
-            return Ok(await _service.GetItem(id));
+            try
+            {
+                return Ok(await _service.GetItem(id));
+            }
+            catch(Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+            
         }
 
         [HttpPut("{id}")]
@@ -57,9 +71,17 @@ namespace BookRentalSystem.Controllers
                 return NotFound("No record exists with that ID.");
             }
 
-            await _service.UpdateCustomer(id, customerDTO);
+            try
+            {
+                await _service.UpdateCustomer(id, customerDTO);
 
-            return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+                return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
 
             
         }
@@ -71,11 +93,17 @@ namespace BookRentalSystem.Controllers
             {
                 return Problem("Internal Server Error.");
             }
+            try
+            {
+                var customer = await _service.AddCustomer(customerDTO);
 
-            var customer = await _service.AddCustomer(customerDTO);
-
-
-            return CreatedAtAction("GetCustomer", new { id = customer.CustomerID }, customerDTO);
+                return CreatedAtAction("GetCustomer", new { id = customer.CustomerID }, customerDTO);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
         }
 
         [HttpDelete("{id}")]
@@ -89,11 +117,17 @@ namespace BookRentalSystem.Controllers
             if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
-            }                                                                       
+            }
+            try
+            {
+                await _service.Delete(id);
 
-            await _service.Delete(id);
-
-            return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+                return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+            }
+            catch(Exception ex)
+            {
+                return Problem(ex.Message);
+            }
         }
 
     }

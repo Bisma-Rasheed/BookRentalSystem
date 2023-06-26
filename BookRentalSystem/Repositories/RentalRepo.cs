@@ -23,33 +23,41 @@ namespace BookRentalSystem.Repositories
         }
         public async Task<Rental> AddRentalInfo(RentalDTO rentalDTO)
         {
-            Rental rental = new()
+            try
             {
-                BookID = rentalDTO.BookID,
-                CustomerID = rentalDTO.CustomerID,
-                RentalDate = rentalDTO.RentalDate,
-                ReturnDate = rentalDTO.ReturnDate,
-                LateFee = rentalDTO.LateFee
-            };
+                Rental rental = new()
+                {
+                    BookID = rentalDTO.BookID,
+                    CustomerID = rentalDTO.CustomerID,
+                    RentalDate = rentalDTO.RentalDate,
+                    ReturnDate = rentalDTO.ReturnDate,
+                    LateFee = rentalDTO.LateFee
+                };
 
-            _dbSet.Add(rental);
-            await Save();
-            return rental;
+                _dbSet.Add(rental);
+                await Save();
+                return rental;
+            }
+            catch (Exception) { throw; }
+            
         }
-
 
         public async Task UpdateRentalInfo(int id, RentalDTO rentalDTO)
         {
-            var rental = await GetById(id);
-            rental.BookID = rentalDTO.BookID;
-            rental.CustomerID = rentalDTO.CustomerID;
-            rental.RentalDate = rentalDTO.RentalDate;
-            rental.ReturnDate = rentalDTO.ReturnDate;
-            rental.LateFee = rentalDTO.LateFee;
+            try
+            {
+                var rental = await GetById(id);
+                rental.BookID = rentalDTO.BookID;
+                rental.CustomerID = rentalDTO.CustomerID;
+                rental.RentalDate = rentalDTO.RentalDate;
+                rental.ReturnDate = rentalDTO.ReturnDate;
+                rental.LateFee = rentalDTO.LateFee;
 
-            UpdateDB(rental);
-            await Save();
-            return;
+                UpdateDB(rental);
+                await Save();
+                return;
+            }
+            catch (Exception) { throw; }
         }
     }
 }

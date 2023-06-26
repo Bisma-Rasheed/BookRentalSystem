@@ -24,8 +24,15 @@ namespace BookRentalSystem.Controllers
             {
                 return Problem("Internal Server Error.");
             }
-
-            return Ok(await _service.GetAllItems());
+            try
+            {
+                return Ok(await _service.GetAllItems());
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+            
             
         }
 
@@ -41,8 +48,15 @@ namespace BookRentalSystem.Controllers
             {
                 return NotFound("No record exists with that ID.");
             }
-
-            return Ok(await _service.GetItem(id));
+            try
+            {
+                return Ok(await _service.GetItem(id));
+            }
+            catch(Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+            
         }
 
         [HttpPost]
@@ -53,14 +67,24 @@ namespace BookRentalSystem.Controllers
                 return Problem("Internal Server Error.");
             }
 
-            var bAuthor = await _service.AddBookAuthor(bookAuthorDTO);
+            try
+            {
+                var bAuthor = await _service.AddBookAuthor(bookAuthorDTO);
+                return CreatedAtAction("GetBookAuthorInfo", new { id = bAuthor.BookAuthorID }, bookAuthorDTO);
+            }
+            catch (Exception ex)
+            {
+                return Problem($"DBUpdateException: {ex.Message} " +
+                    $"The INSERT statement conflicted with the FOREIGN KEY constraint.");
+            }
 
-            return CreatedAtAction("GetBookAuthorInfo", new { id = bAuthor.BookAuthorID }, bookAuthorDTO);
+
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBookAuthor(int id, [FromBody] BookAuthorDTO bookAuthorDTO)
         {
+            
             if (!_service.IfTableExists())
             {
                 return NotFound();
@@ -71,9 +95,18 @@ namespace BookRentalSystem.Controllers
                 return NotFound("No record exists with that ID.");
             }
 
-            await _service.UpdateBookAuthor(id, bookAuthorDTO);
+            try
+            {
+                await _service.UpdateBookAuthor(id, bookAuthorDTO);
 
-            return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+                return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+            }
+            catch(Exception ex)
+            {
+                return Problem($"DBUpdateException: {ex.Message}, " +
+                    $"The UPDATE statement conflicted with the FOREIGN KEY constraint.");
+            }
+            
         }
 
         [HttpDelete("{id}")]
@@ -88,10 +121,17 @@ namespace BookRentalSystem.Controllers
             {
                 return NotFound("No record exists with that ID.");
             }
+            try
+            {
+                await _service.Delete(id);
 
-            await _service.Delete(id);
-
-            return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+                return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+            }
+            catch(Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+           
         }
     }
 }

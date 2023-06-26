@@ -2,7 +2,6 @@
 using BookRentalSystem.DTO;
 using BookRentalSystem.Models;
 using BookRentalSystem.Services.IServices;
-using BookRentalSystem.UnitOfWork;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookRentalSystem.Controllers
@@ -21,28 +20,44 @@ namespace BookRentalSystem.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Rental>>> GetAll()
         {
+           
             if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
-
-            return Ok(await _service.GetAllItems());
+            try
+            {
+                return Ok(await _service.GetAllItems());
+            }
+            catch(Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+            
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Rental>> GetById(int id)
         {
-            if(!_service.IfTableExists())
+            
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
 
-            if(!await _service.IfExists(id))
+            if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
-
-            return Ok(await _service.GetItem(id));
+            try
+            {
+                return Ok(await _service.GetItem(id));
+            }
+            catch(Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+           
         }
 
         [HttpPost]
@@ -53,27 +68,46 @@ namespace BookRentalSystem.Controllers
                 return Problem("Internal Server Error.");
             }
 
-            var rental = await _service.AddRental(rentalDTO);
+            try
+            {
+                var rental = await _service.AddRental(rentalDTO);
 
-            return CreatedAtAction("GetById", new { id = rental.RentalID }, rentalDTO);
+                return CreatedAtAction("GetById", new { id = rental.RentalID }, rentalDTO);
+            }
+            catch (Exception ex)
+            {
+                return Problem($"DBUpdateException: {ex.Message} " +
+                    $"The INSERT statement conflicted with the FOREIGN KEY constraint.");
+            }
+
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRental(int id, [FromBody] RentalDTO rentalDTO)
         {
+            
             if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
-
+            
             if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
 
-            await _service.UpdateRental(id, rentalDTO);
+            try
+            {
+                await _service.UpdateRental(id, rentalDTO);
 
-            return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+                return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+            }
+            catch(Exception ex)
+            {
+                return Problem($"DbUpdateException: {ex.Message}, " +
+                    $"The UPDATE statement conflicted with the FOREIGN KEY constraint.");
+            }
+            
         }
 
         [HttpDelete("{id}")]
@@ -84,14 +118,23 @@ namespace BookRentalSystem.Controllers
                 return Problem("Internal Server Error.");
             }
 
+            
             if (!await _service.IfExists(id))
             {
                 return NotFound("No record exists with that ID.");
             }
-            
-            await _service.Delete(id);
 
-            return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+            try
+            {
+                await _service.Delete(id);
+
+                return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+            }
+            catch(Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+            
         }
     }
 }

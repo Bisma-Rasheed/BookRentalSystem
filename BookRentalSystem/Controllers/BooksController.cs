@@ -24,7 +24,11 @@ namespace BookRentalSystem.Controllers
                 return Problem("Internal Server Error.");
             }
 
-            return Ok(await _service.GetAllItems());
+            try
+            {
+                return Ok(await _service.GetAllItems());
+            }
+            catch (Exception ex) { return Problem(ex.Message); }
         }
 
         [HttpGet("{id}")]
@@ -40,7 +44,11 @@ namespace BookRentalSystem.Controllers
                 return NotFound("No record exists with that ID.");
             }
 
-            return Ok(await _service.GetItem(id));
+            try
+            {
+                return Ok(await _service.GetItem(id));
+            }
+            catch (Exception ex) { return Problem(ex.Message); }
         }
 
 
@@ -52,9 +60,17 @@ namespace BookRentalSystem.Controllers
                 return Problem("Internal Server Error.");
             }
 
-            var book = await _service.AddBook(bookDTO);
+            try
+            {
+                var book = await _service.AddBook(bookDTO);
 
-            return CreatedAtAction("GetBook", new { id = book.BookID }, bookDTO);
+                return CreatedAtAction("GetBook", new { id = book.BookID }, bookDTO);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         [HttpPut("{id}")]
@@ -70,15 +86,23 @@ namespace BookRentalSystem.Controllers
                 return NotFound("No record exists with that ID.");
             }
 
-            await _service.UpdateBook(id, bookDTO);
+            try
+            {
+                await _service.UpdateBook(id, bookDTO);
 
-            return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+                return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            if (!   _service.IfTableExists())
+            if (!_service.IfTableExists())
             {
                 return Problem("Internal Server Error.");
             }
@@ -88,9 +112,17 @@ namespace BookRentalSystem.Controllers
                 return NotFound("No record exists with that ID.");
             }
 
-            await _service.Delete(id);
+            try
+            {
+                await _service.Delete(id);
 
-            return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+                return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+            }
+            catch( Exception ex) 
+            { 
+                return Problem(ex.Message);
+            }
+            
         }
 
     }

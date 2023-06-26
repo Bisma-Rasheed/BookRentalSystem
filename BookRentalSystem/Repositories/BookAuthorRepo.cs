@@ -23,26 +23,35 @@ namespace BookRentalSystem.Repositories
         }
         public async Task<BookAuthor> AddBookAuthor(BookAuthorDTO bookAuthorDTO)
         {
-            BookAuthor bookAuthor = new()
+            try
             {
-                BookID = bookAuthorDTO.BookID,
-                AuthorID = bookAuthorDTO.AuthorID
-            };
+                BookAuthor bookAuthor = new()
+                {
+                    BookID = bookAuthorDTO.BookID,
+                    AuthorID = bookAuthorDTO.AuthorID
+                };
 
-            _dbSet.Add(bookAuthor);
-            await Save();
-            return bookAuthor;
+                _dbSet.Add(bookAuthor);
+                await Save();
+                return bookAuthor;
+            }
+            catch(Exception) { throw; } 
         }
 
         public async Task UpdateBookAuthor(int id, BookAuthorDTO bookAuthorDTO)
         {
-            var bookAuthor = await GetById(id);
-            bookAuthor.BookID = bookAuthorDTO.BookID;
-            bookAuthor.AuthorID = bookAuthorDTO.AuthorID;
+            try
+            {
+                var bookAuthor = await GetById(id);
+                bookAuthor.BookID = bookAuthorDTO.BookID;
+                bookAuthor.AuthorID = bookAuthorDTO.AuthorID;
 
-            UpdateDB(bookAuthor);
-            await Save();
-            return;
+                UpdateDB(bookAuthor);
+                await Save();
+                return;
+            }
+            catch (Exception) { throw; }
+            
         }
     }
 }
