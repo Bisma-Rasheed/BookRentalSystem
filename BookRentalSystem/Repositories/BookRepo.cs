@@ -33,7 +33,7 @@ namespace BookRentalSystem.Repositories
             book.RentalPrice = bookDTO.RentalPrice;
 
             UpdateDB(book);
-            Save();
+            await Save();
             return;
         }
     }

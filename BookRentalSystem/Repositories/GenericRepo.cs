@@ -22,7 +22,7 @@ namespace BookRentalSystem.Repositories
 
         public async Task<T> GetById(int id)
         {
-            var entity = await _dbSet.FindAsync(id);
+            T? entity = await _dbSet.FindAsync(id);
             return entity;
         }
 
