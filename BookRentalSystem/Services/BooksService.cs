@@ -10,7 +10,7 @@ namespace BookRentalSystem.Services
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public BooksService(IUnitOfWork unitOfWork, IGenericRepo<Book> _repo) : base(_repo)
+        public BooksService(IUnitOfWork unitOfWork, IBookRepo _repo) : base(_repo)
         {
             _unitOfWork = unitOfWork;
         }

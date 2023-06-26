@@ -23,7 +23,7 @@ namespace BookRentalSystem.Repositories
             await Save();
             return book;
         }
-
+        
         public async Task UpdateBook(int id, BookDTO bookDTO)
         {
             var book = await GetById(id);

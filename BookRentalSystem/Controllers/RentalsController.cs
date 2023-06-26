@@ -99,7 +99,6 @@ namespace BookRentalSystem.Controllers
             try
             {
                 await _service.UpdateRental(id, rentalDTO);
-
                 return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
             }
             catch(Exception ex)
