@@ -6,7 +6,6 @@ using BookRentalSystem.Repositories;
 using BookRentalSystem.UnitOfWork;
 using BookRentalSystem.Services.IServices;
 using BookRentalSystem.Services;
-using BookRentalSystem.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,9 +25,9 @@ builder.Services.AddScoped<IAuthorsService, AuthorsService>();
 builder.Services.AddScoped<IRentalsService, RentalsService>();
 //BookAuthor Service
 builder.Services.AddScoped<IBookAuthorsService, BookAuthorsService>();
-//unit of work
+//unit of work -> required by services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-//For Books
+//For Books -> required by unit of work
 builder.Services.AddScoped<IBookRepo, BookRepo>();
 //For Customers
 builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
