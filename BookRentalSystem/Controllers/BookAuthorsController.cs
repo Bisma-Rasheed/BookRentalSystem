@@ -3,6 +3,7 @@ using BookRentalSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using BookRentalSystem.DTO;
 using BookRentalSystem.Services.IServices;
+using BookRentalSystem.Models.ErrorHandling;
 
 namespace BookRentalSystem.Controllers
 {
@@ -22,7 +23,8 @@ namespace BookRentalSystem.Controllers
         {
             if (!_service.IfTableExists())
             {
-                return Problem("Internal Server Error.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." });
             }
             try
             {
@@ -30,7 +32,8 @@ namespace BookRentalSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Problem(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = ex.Message });
             }
             
             
@@ -41,12 +44,14 @@ namespace BookRentalSystem.Controllers
         {
             if (!_service.IfTableExists())
             {
-                return Problem("Internal Server Error.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." })
             }
 
             if (!await _service.IfExists(id))
             {
-                return NotFound("No record exists with that ID.");
+                return StatusCode(StatusCodes.Status404NotFound,
+                    new Response { Status = "Error", Message = "No record exists with that ID." });
             }
             try
             {
@@ -54,7 +59,8 @@ namespace BookRentalSystem.Controllers
             }
             catch(Exception ex)
             {
-                return Problem(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = ex.Message });
             }
             
         }
@@ -64,7 +70,8 @@ namespace BookRentalSystem.Controllers
         {
             if (!_service.IfTableExists())
             {
-                return Problem("Internal Server Error.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." });
             }
 
             try
@@ -74,8 +81,13 @@ namespace BookRentalSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Problem($"DBUpdateException: {ex.Message} " +
-                    $"The INSERT statement conflicted with the FOREIGN KEY constraint.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response
+                    {
+                        Status = "Error",
+                        Message = $"DBUpdateException: {ex.Message} " +
+                    $"The INSERT statement conflicted with the FOREIGN KEY constraint."
+                    });
             }
 
 
@@ -87,24 +99,32 @@ namespace BookRentalSystem.Controllers
             
             if (!_service.IfTableExists())
             {
-                return NotFound();
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." });
             }
 
             if (!await _service.IfExists(id))
             {
-                return NotFound("No record exists with that ID.");
+                return StatusCode(StatusCodes.Status404NotFound,
+                    new Response { Status = "Error", Message = "No record exists with that ID." });
             }
 
             try
             {
                 await _service.UpdateBookAuthor(id, bookAuthorDTO);
 
-                return Ok($"Updated Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+                return StatusCode(StatusCodes.Status200OK,
+                    new Response { Status = "Success", Message = "Updated Successfully." });
             }
             catch(Exception ex)
             {
-                return Problem($"DBUpdateException: {ex.Message}, " +
-                    $"The UPDATE statement conflicted with the FOREIGN KEY constraint.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response
+                    {
+                        Status = "Error",
+                        Message = $"DBUpdateException: {ex.Message} " +
+                    $"The UPDATE statement conflicted with the FOREIGN KEY constraint."
+                    });
             }
             
         }
@@ -114,22 +134,26 @@ namespace BookRentalSystem.Controllers
         {
             if (!_service.IfTableExists())
             {
-                return Problem("Internal Server Error.");
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." })
             }
-
+            
             if (!await _service.IfExists(id))
             {
-                return NotFound("No record exists with that ID.");
+                return StatusCode(StatusCodes.Status404NotFound,
+                    new Response { Status = "Error", Message = "No record exists with that ID." });
             }
             try
             {
                 await _service.Delete(id);
 
-                return Ok($"Deleted Successfully. \nStatus Code: {StatusCodes.Status204NoContent}-No Content");
+                return StatusCode(StatusCodes.Status200OK,
+                    new Response { Status = "Success", Message = "Deleted Successfully." });
             }
             catch(Exception ex)
             {
-                return Problem(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = ex.Message });
             }
            
         }

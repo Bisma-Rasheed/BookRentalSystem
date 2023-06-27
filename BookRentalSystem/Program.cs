@@ -15,12 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddJsonOptions(opt=>opt.JsonSerializerOptions.DefaultIgnoreCondition=JsonIgnoreCondition.WhenWritingNull);
 builder.Services.AddDbContext<BRSContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 //injecting dependencies
-////generic repos
-//builder.Services.AddScoped<IGenericRepo<Book>, GenericRepo<Book>>();
-//builder.Services.AddScoped<IGenericRepo<Customer>, GenericRepo<Customer>>();
-//builder.Services.AddScoped<IGenericRepo<Rental>, GenericRepo<Rental>>();
-//builder.Services.AddScoped<IGenericRepo<Author>, GenericRepo<Author>>();
-//builder.Services.AddScoped<IGenericRepo<BookAuthor>, GenericRepo<BookAuthor>>();
 
 //Book service
 builder.Services.AddScoped<IBooksService, BooksService>();
