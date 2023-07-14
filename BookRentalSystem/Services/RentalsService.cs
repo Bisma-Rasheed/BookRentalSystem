@@ -1,5 +1,5 @@
-﻿using BookRentalSystem.DTO;
-using BookRentalSystem.Models;
+﻿using BookRentalSystem.Models;
+using BookRentalSystem.Models.DTO.ModelDTOs;
 using BookRentalSystem.Repositories.IRepositories;
 using BookRentalSystem.Services.IServices;
 using BookRentalSystem.UnitOfWork;
@@ -24,5 +24,11 @@ namespace BookRentalSystem.Services
             await _unitOfWork.RentalRepository.UpdateRentalInfo(id, rentalDTO);
             return;
         }  
+
+        public async Task<IEnumerable<Rental>> GetRentalsByCustomer(string id)
+        {
+            var rentals = await _unitOfWork.RentalRepository.GetRentalsByCustomer(id);
+            return rentals;
+        }
     }
 }

@@ -1,5 +1,5 @@
-﻿using BookRentalSystem.DTO;
-using BookRentalSystem.Models;
+﻿using BookRentalSystem.Models;
+using BookRentalSystem.Models.DTO.ModelDTOs;
 
 namespace BookRentalSystem.Services.IServices
 {
@@ -7,5 +7,6 @@ namespace BookRentalSystem.Services.IServices
     {
         Task<Rental> AddRental(RentalDTO rentalDTO);
         Task UpdateRental(int id, RentalDTO rentalDTO);
+        Task<IEnumerable<Rental>> GetRentalsByCustomer(string id);
     }
 }

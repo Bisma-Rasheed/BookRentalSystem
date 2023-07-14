@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BookRentalSystem.DTO
+namespace BookRentalSystem.Models.DTO.ModelDTOs
 {
     public class BookDTO
     {
@@ -12,5 +12,7 @@ namespace BookRentalSystem.DTO
         public string isAvailable { get; set; }
         [Required] //this required KW is for the model, i.e. it will mark the field with * denoting it is required
         public decimal RentalPrice { get; set; }
+        [Required]
+        public int Quantity { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using BookRentalSystem.Data;
-using BookRentalSystem.DTO;
 using BookRentalSystem.Models;
+using BookRentalSystem.Models.DTO.ModelDTOs;
 using BookRentalSystem.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +19,7 @@ namespace BookRentalSystem.Repositories
         {
             BookAuthor? bookAuthor = await _dbSet.Where(ba => ba.BookAuthorID == id)
                 .Include(ba => ba.Book).Include(ba => ba.Author).SingleOrDefaultAsync();
-            return bookAuthor;
+            return bookAuthor!;
         }
         public async Task<BookAuthor> AddBookAuthor(BookAuthorDTO bookAuthorDTO)
         {
@@ -52,6 +52,19 @@ namespace BookRentalSystem.Repositories
             }
             catch (Exception) { throw; }
             
+        }
+
+        public async Task<BookAuthor> GetByBookId(int bookID)
+        {
+            var bAuthor =  await _dbSet.Where(ba => ba.BookID == bookID).SingleOrDefaultAsync();
+            return bAuthor!;
+        }
+
+        public async Task<IEnumerable<BookAuthor>> GetByAuthorId(int id)
+        {
+            var bAuthor = await _dbSet.Where(ba => ba.AuthorID == id).Include(ba => ba.Book)
+                .Include(ba=>ba.Author).ToListAsync();
+            return bAuthor;
         }
     }
 }

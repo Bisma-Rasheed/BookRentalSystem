@@ -1,6 +1,6 @@
 ﻿using BookRentalSystem.Data;
-using BookRentalSystem.DTO;
 using BookRentalSystem.Models;
+using BookRentalSystem.Models.DTO.ModelDTOs;
 using BookRentalSystem.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +19,14 @@ namespace BookRentalSystem.Repositories
         {
             //eager loading using include
             Rental? rental = await _dbSet.Where(r => r.RentalID == id).Include(r => r.Book).Include(r => r.Customer).SingleOrDefaultAsync();
-            return rental;
+            return rental!;
+        }
+
+        public async Task<IEnumerable<Rental>> GetRentalsByCustomer(string id)
+        {
+            var rentals = await _dbSet.Where(r => r.CustomerID == id)
+                .Include(r => r.Book).Include(r => r.Customer).ToListAsync();
+            return rentals;
         }
         public async Task<Rental> AddRentalInfo(RentalDTO rentalDTO)
         {

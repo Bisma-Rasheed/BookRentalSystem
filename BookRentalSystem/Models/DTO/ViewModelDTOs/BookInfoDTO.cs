@@ -1,17 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BookRentalSystem.Models
+namespace BookRentalSystem.Models.DTO.ViewModelDTOs
 {
-    public class Book
+    public class BookInfoDTO
     {
-        [Key]
-        public int BookID { get; set; }
         [Required, StringLength(50)]
-        public string? Title { get; set; }
+        public string? BookName { get; set; }
         [Required]
-        public string? Description { get; set; }
+        public string? About_Book { get; set; }
+        [Required]
+        public string? Author { get; set; }
+        [Required]
+        public string? About_Author { get; set; }
         [Required, StringLength(10)]
-        public string? isAvailable { get; set; }
+        public string isAvailable { get; set; }
         [Required] //this required KW is for the model, i.e. it will mark the field with * denoting it is required
         public decimal RentalPrice { get; set; }
         [Required]

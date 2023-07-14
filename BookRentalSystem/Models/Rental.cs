@@ -10,7 +10,7 @@ namespace BookRentalSystem.Models
         public int BookID { get; set; }
         public Book? Book { get; set; }
         [Required]
-        public int CustomerID { get; set; }
+        public string? CustomerID { get; set; }
         public Customer? Customer { get; set; }
         [Required, DataType(DataType.Date)]
         public DateTime RentalDate { get; set; }

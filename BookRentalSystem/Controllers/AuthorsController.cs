@@ -1,11 +1,13 @@
-﻿using BookRentalSystem.DTO;
-using BookRentalSystem.Models;
+﻿using BookRentalSystem.Models;
 using BookRentalSystem.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using BookRentalSystem.Models.ErrorHandling;
+using Microsoft.AspNetCore.Authorization;
+using BookRentalSystem.Models.DTO.ModelDTOs;
 
 namespace BookRentalSystem.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class AuthorsController : ControllerBase
@@ -20,23 +22,32 @@ namespace BookRentalSystem.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Author>>> GetAuthors()
         {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"Author\" is null." });
-            }
             try
             {
-                return Ok(await _service.GetAllItems());
+                if (!_service.IfTableExists())
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                        new Response { Status = "Error", Message = "The entity set \"Author\" is null." });
+                }
+                try
+                {
+                    return Ok(await _service.GetAllItems());
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                        new Response { Status = "Error", Message = ex.Message });
+                }
             }
             catch(Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = ex.Message });
+                return StatusCode(StatusCodes.Status403Forbidden,
+                        new Response { Status = "Error", Message = ex.Message });
             }
            
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Author>> GetAuthor(int id)
         {
@@ -65,30 +76,7 @@ namespace BookRentalSystem.Controllers
 
         }
 
-        [HttpPost]
-        public async Task<ActionResult<AuthorDTO>> AddAuthor([FromBody] AuthorDTO authorDTO)
-        {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"Author\" is null." });
-            }
-
-            try
-            {
-                var author = await _service.AddAuthor(authorDTO);
-
-                return CreatedAtAction("GetAuthor", new { id = author.AuthorID }, authorDTO);
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest,
-                    new Response { Status = "Error", Message = $"Author failed to create. {ex.Message}" });
-            }
-            
-        }
-
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAuthor(int id, [FromBody] AuthorDTO authorDTO)
         {
@@ -118,8 +106,9 @@ namespace BookRentalSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCustomer(int id)
+        public async Task<IActionResult> DeleteAuthor(int id)
         {
             if (!_service.IfTableExists())
             {

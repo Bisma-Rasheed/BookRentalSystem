@@ -1,9 +1,12 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using BookRentalSystem.Models;
-using BookRentalSystem.DTO;
 using BookRentalSystem.Services.IServices;
 using BookRentalSystem.Models.ErrorHandling;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using BookRentalSystem.Models.DTO.ModelDTOs;
+using BookRentalSystem.Models.DTO.ViewModelDTOs;
 
 namespace BookRentalSystem.Controllers
 {
@@ -18,6 +21,7 @@ namespace BookRentalSystem.Controllers
             _service = service;
         }
 
+        [Authorize(Roles ="Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
@@ -28,7 +32,23 @@ namespace BookRentalSystem.Controllers
             }
             try
             {
-                return Ok(await _service.GetAllItems());
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var customers = await _service.GetAllItems(userId!);
+                List<CustomerInfoDTO> customersInfo = new();
+                foreach (var customer in customers)
+                {
+                    customersInfo.Add(new CustomerInfoDTO 
+                    { 
+                        Id = customer.Id,
+                        Username = customer.UserName,
+                        Email = customer.Email,
+                        EmailConfirmed = customer.EmailConfirmed,
+                        PhoneNumber = customer.PhoneNumber,
+                        PhoneNumberConfirmed = customer.PhoneNumberConfirmed,
+                        TwoFactorEnabled = customer.TwoFactorEnabled,
+                    });
+                }
+                return Ok(customersInfo);
             }
             catch(Exception ex)
             {
@@ -39,7 +59,7 @@ namespace BookRentalSystem.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
+        public async Task<ActionResult<Customer>> GetCustomer(string id)
         {
             if (!_service.IfTableExists())
             {
@@ -47,25 +67,42 @@ namespace BookRentalSystem.Controllers
                     new Response { Status = "Error", Message = "The entity set \"Customer\" is null." });
             }
 
-            if (! await _service.IfExists(id))
+            if (!(User.FindFirstValue(ClaimTypes.Role) == "Admin"))
+            {
+                id = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            }
+            //return Ok();
+            if (!await _service.IfExists(id!))
             {
                 return StatusCode(StatusCodes.Status404NotFound,
                     new Response { Status = "Error", Message = "No record exists with that ID." });
             }
             try
             {
-                return Ok(await _service.GetItem(id));
+                var customer = await _service.GetItem(id);
+                var customerInfo = new CustomerInfoDTO
+                {
+                    Id = customer.Id,
+                    Username = customer.UserName,
+                    Email = customer.Email,
+                    EmailConfirmed = customer.EmailConfirmed,
+                    PhoneNumber = customer.PhoneNumber,
+                    PhoneNumberConfirmed = customer.PhoneNumberConfirmed,
+                    TwoFactorEnabled = customer.TwoFactorEnabled,
+                };
+                return Ok(customerInfo);
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new Response { Status = "Error", Message = ex.Message });
             }
-            
+
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> PutCustomer(int id, CustomerDTO customerDTO)
+        public async Task<ActionResult> PutCustomer(string id, CustomerDTO customerDTO)
         {
             if (!_service.IfTableExists())
             {
@@ -92,34 +129,11 @@ namespace BookRentalSystem.Controllers
                     new Response { Status = "Error", Message = $"Customer failed to update. {ex.Message}" });
             }
             
-
-            
         }
 
-        [HttpPost]
-        public async Task<ActionResult<CustomerDTO>> PostCustomer(CustomerDTO customerDTO)
-        {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"Customer\" is null." });
-            }
-            try
-            {
-                var customer = await _service.AddCustomer(customerDTO);
-
-                return CreatedAtAction("GetCustomer", new { id = customer.CustomerID }, customerDTO);
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest,
-                    new Response { Status = "Error", Message = $"Customer failed to create. {ex.Message}" });
-            }
-           
-        }
-
+       
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCustomer(int id)
+        public async Task<IActionResult> DeleteCustomer(string id)
         {
             if (!_service.IfTableExists())
             {

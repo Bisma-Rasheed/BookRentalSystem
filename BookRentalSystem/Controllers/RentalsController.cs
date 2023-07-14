@@ -1,8 +1,10 @@
-﻿using BookRentalSystem.DTO;
-using BookRentalSystem.Models;
+﻿using BookRentalSystem.Models;
 using BookRentalSystem.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using BookRentalSystem.Models.ErrorHandling;
+using Microsoft.AspNetCore.Authorization;
+using BookRentalSystem.Models.DTO.ModelDTOs;
+using BookRentalSystem.Models.DTO.ViewModelDTOs;
 
 namespace BookRentalSystem.Controllers
 {
@@ -17,6 +19,7 @@ namespace BookRentalSystem.Controllers
             _service = service; 
         }
 
+        [Authorize(Roles ="Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Rental>>> GetAll()
         {
@@ -28,7 +31,29 @@ namespace BookRentalSystem.Controllers
             }
             try
             {
-                return Ok(await _service.GetAllItems());
+                var rentals = await _service.GetAllItems();
+                List<RentalInfoAdmin> rentalsInfo = new();
+                foreach(var rental in rentals)
+                {
+                    rentalsInfo.Add(new RentalInfoAdmin
+                    {
+                        RentalID = rental.RentalID,
+                        CustomerID = rental.CustomerID,
+                        BookID = rental.BookID,
+                        BookName = rental.Book!.Title,
+                        About_Book = rental.Book.Description,
+                        isAvailable = rental.Book.isAvailable,
+                        RentalPrice = rental.Book.RentalPrice,
+                        Quantity = rental.Book.Quantity,
+                        RentalDate = rental.RentalDate,
+                        ReturnDate=rental.ReturnDate,
+                        LateFee=rental.LateFee,
+                        CustomerName = rental.Customer!.UserName,
+                        CustomerEmail = rental.Customer!.Email,
+                        Contact = rental.Customer.PhoneNumber
+                    });
+                }
+                return Ok(rentalsInfo);
             }
             catch(Exception ex)
             {
@@ -38,6 +63,7 @@ namespace BookRentalSystem.Controllers
             
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Rental>> GetById(int id)
         {
@@ -55,7 +81,25 @@ namespace BookRentalSystem.Controllers
             }
             try
             {
-                return Ok(await _service.GetItem(id));
+                var rental = await _service.GetItem(id);
+                var rentalInfo = new RentalInfoAdmin
+                {
+                    RentalID = rental.RentalID,
+                    CustomerID = rental.CustomerID,
+                    BookID = rental.BookID,
+                    BookName = rental.Book!.Title,
+                    About_Book = rental.Book.Description,
+                    isAvailable = rental.Book.isAvailable,
+                    RentalPrice = rental.Book.RentalPrice,
+                    Quantity = rental.Book.Quantity,
+                    RentalDate = rental.RentalDate,
+                    ReturnDate = rental.ReturnDate,
+                    LateFee = rental.LateFee,
+                    CustomerName = rental.Customer!.UserName,
+                    CustomerEmail = rental.Customer!.Email,
+                    Contact = rental.Customer.PhoneNumber
+                };
+                return Ok(rentalInfo);
             }
             catch(Exception ex)
             {
@@ -65,34 +109,7 @@ namespace BookRentalSystem.Controllers
            
         }
 
-        [HttpPost]
-        public async Task<ActionResult<RentalDTO>> AddRental([FromBody] RentalDTO rentalDTO)
-        {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"Rental\" is null." });
-            }
-
-            try
-            {
-                var rental = await _service.AddRental(rentalDTO);
-
-                return CreatedAtAction("GetById", new { id = rental.RentalID }, rentalDTO);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response
-                    {
-                        Status = "Error",
-                        Message = $"DBUpdateException: {ex.Message} " +
-                    $"The INSERT statement conflicted with the FOREIGN KEY constraint."
-                    });
-            }
-
-        }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRental(int id, [FromBody] RentalDTO rentalDTO)
         {
@@ -128,6 +145,7 @@ namespace BookRentalSystem.Controllers
             
         }
 
+        [Authorize(Roles ="Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRental(int id)
         {

@@ -4,9 +4,13 @@ using BookRentalSystem.Models;
 using BookRentalSystem.DTO;
 using BookRentalSystem.Services.IServices;
 using BookRentalSystem.Models.ErrorHandling;
+using Microsoft.AspNetCore.Authorization;
+using BookRentalSystem.Models.DTO.ModelDTOs;
+using BookRentalSystem.Models.DTO.ViewModelDTOs;
 
 namespace BookRentalSystem.Controllers
 {
+    //[Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class BooksController : ControllerBase
@@ -16,6 +20,7 @@ namespace BookRentalSystem.Controllers
         {
             _service = service;
         }
+
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetAllBooks()
@@ -37,6 +42,29 @@ namespace BookRentalSystem.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("/AvailableBooks")]
+        public async Task<ActionResult<IEnumerable<Book>>> AvailableBooks()
+        {
+            if (!_service.IfTableExists())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = "The entity set \"Book\" is null." });
+            }
+
+            try
+            {
+                return Ok(await _service.GetAvailableBooks());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = ex.Message });
+            }
+        }
+
+
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
@@ -63,9 +91,9 @@ namespace BookRentalSystem.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<BookDTO>> AddBook([FromBody] BookDTO bookDTO)
+        public async Task<ActionResult<BookDTO>> AddBookInfo([FromBody] BookInfoDTO bookInfoDTO)
         {
             if (!_service.IfTableExists())
             {
@@ -75,9 +103,9 @@ namespace BookRentalSystem.Controllers
 
             try
             {
-                var book = await _service.AddBook(bookDTO);
+                var book = await _service.AddBook(bookInfoDTO);
 
-                return CreatedAtAction("GetBook", new { id = book.BookID }, bookDTO);
+                return CreatedAtAction("GetBook", new { id = book.BookID }, bookInfoDTO);
             }
             catch(Exception ex)
             {
@@ -86,9 +114,10 @@ namespace BookRentalSystem.Controllers
             }
             
         }
-
+        
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(int id, [FromBody] BookDTO bookDTO)
+        public async Task<IActionResult> UpdateBook(int id, [FromBody] BookUpdateDTO bookUpdateDTO)
         {
             if (!_service.IfTableExists())
             {
@@ -104,7 +133,7 @@ namespace BookRentalSystem.Controllers
 
             try
             {
-                await _service.UpdateBook(id, bookDTO);
+                await _service.UpdateBook(id, bookUpdateDTO);
 
                 return StatusCode(StatusCodes.Status200OK,
                     new Response { Status = "Success", Message = "Updated Successfully." });
@@ -117,6 +146,7 @@ namespace BookRentalSystem.Controllers
             
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {

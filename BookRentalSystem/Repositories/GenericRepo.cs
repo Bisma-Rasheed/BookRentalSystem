@@ -1,4 +1,5 @@
 ﻿using BookRentalSystem.Data;
+using BookRentalSystem.Models;
 using BookRentalSystem.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,7 @@ namespace BookRentalSystem.Repositories
 {
     public abstract class GenericRepo<T> : IGenericRepo<T> where T : class
     {
-        private readonly BRSContext _context;
+        protected readonly BRSContext _context;
         protected readonly DbSet<T> _dbSet;
 
         public GenericRepo(BRSContext context)
@@ -23,7 +24,13 @@ namespace BookRentalSystem.Repositories
         public async Task<T> GetById(int id)
         {
             T? entity = await _dbSet.FindAsync(id);
-            return entity;
+            return entity!;
+        }
+
+        public async Task<T> GetById(string id)
+        {
+            T? entity = await _dbSet.FindAsync(id);
+            return entity!;
         }
 
         public async Task RemoveItem(int id)
@@ -54,6 +61,16 @@ namespace BookRentalSystem.Repositories
             return false;
         }
 
+        public async Task<bool> IfExists(string id)
+        {
+            var entity = await _dbSet.FindAsync(id);
+            if (entity != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public bool IfTableExists()
         {
             if (_dbSet != null)
@@ -62,6 +79,14 @@ namespace BookRentalSystem.Repositories
             }
 
             return false;
+        }
+
+        public async Task RemoveItem(string id)
+        {
+            var entity = await GetById(id);
+            _dbSet.Remove(entity);
+            await Save();
+            return;
         }
     }
 }

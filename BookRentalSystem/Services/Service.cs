@@ -1,4 +1,5 @@
-﻿using BookRentalSystem.Repositories.IRepositories;
+﻿using BookRentalSystem.Models;
+using BookRentalSystem.Repositories.IRepositories;
 using BookRentalSystem.Services.IServices;
 
 namespace BookRentalSystem.Services
@@ -22,11 +23,15 @@ namespace BookRentalSystem.Services
             return await _repository.GetById(id);
         }
 
+        public async Task<T> GetItem(string id)
+        {
+            return await _repository.GetById(id);
+        }
+
         public async Task<bool> IfExists(int id)
         {
             return await _repository.IfExists(id);
         }
-
         public bool IfTableExists()
         {
             return _repository.IfTableExists();

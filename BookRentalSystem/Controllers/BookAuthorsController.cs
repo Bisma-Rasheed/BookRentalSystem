@@ -1,12 +1,15 @@
 ﻿
 using BookRentalSystem.Models;
 using Microsoft.AspNetCore.Mvc;
-using BookRentalSystem.DTO;
 using BookRentalSystem.Services.IServices;
 using BookRentalSystem.Models.ErrorHandling;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
+using BookRentalSystem.Models.DTO.ModelDTOs;
 
 namespace BookRentalSystem.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class BookAuthorsController : ControllerBase
@@ -45,7 +48,7 @@ namespace BookRentalSystem.Controllers
             if (!_service.IfTableExists())
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." })
+                    new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." });
             }
 
             if (!await _service.IfExists(id))
@@ -65,33 +68,33 @@ namespace BookRentalSystem.Controllers
             
         }
 
-        [HttpPost]
-        public async Task<ActionResult<BookAuthor>> AddBookAuthor([FromBody] BookAuthorDTO bookAuthorDTO)
-        {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." });
-            }
+        //[HttpPost]
+        //public async Task<ActionResult<BookAuthor>> AddBookAuthor([FromBody] BookAuthorDTO bookAuthorDTO)
+        //{
+        //    if (!_service.IfTableExists())
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError,
+        //            new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." });
+        //    }
 
-            try
-            {
-                var bAuthor = await _service.AddBookAuthor(bookAuthorDTO);
-                return CreatedAtAction("GetBookAuthorInfo", new { id = bAuthor.BookAuthorID }, bookAuthorDTO);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response
-                    {
-                        Status = "Error",
-                        Message = $"DBUpdateException: {ex.Message} " +
-                    $"The INSERT statement conflicted with the FOREIGN KEY constraint."
-                    });
-            }
+        //    try
+        //    {
+        //        var bAuthor = await _service.AddBookAuthor(bookAuthorDTO);
+        //        return CreatedAtAction("GetBookAuthorInfo", new { id = bAuthor.BookAuthorID }, bookAuthorDTO);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError,
+        //            new Response
+        //            {
+        //                Status = "Error",
+        //                Message = $"DBUpdateException: {ex.Message} " +
+        //            $"The INSERT statement conflicted with the FOREIGN KEY constraint."
+        //            });
+        //    }
 
 
-        }
+        //}
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBookAuthor(int id, [FromBody] BookAuthorDTO bookAuthorDTO)
@@ -135,7 +138,7 @@ namespace BookRentalSystem.Controllers
             if (!_service.IfTableExists())
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." })
+                    new Response { Status = "Error", Message = "The entity set \"BookAuthors\" is null." });
             }
             
             if (!await _service.IfExists(id))

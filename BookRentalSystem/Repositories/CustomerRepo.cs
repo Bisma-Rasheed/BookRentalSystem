@@ -1,11 +1,11 @@
 ﻿using BookRentalSystem.Data;
-using BookRentalSystem.DTO;
 using BookRentalSystem.Models;
+using BookRentalSystem.Models.DTO.ModelDTOs;
 using BookRentalSystem.Repositories.IRepositories;
 
 namespace BookRentalSystem.Repositories
 {
-    public class CustomerRepo : GenericRepo<Customer>,ICustomerRepo
+    public class CustomerRepo : GenericRepo<Customer>, ICustomerRepo
     {
         public CustomerRepo(BRSContext context) : base(context) { }
 
@@ -13,22 +13,22 @@ namespace BookRentalSystem.Repositories
         {
             Customer customer = new()
             {
-                CustomerName = customerDTO.CustomerName,
-                Contact = customerDTO.Contact
+                UserName = customerDTO.CustomerName,
+                PhoneNumber = customerDTO.Contact
             };
             _dbSet.Add(customer);
             await Save();
             return customer;
         }
 
-        public async Task UpdateCustomer(int id, CustomerDTO customerDTO)
+        public async Task UpdateCustomer(string id, CustomerDTO customerDTO)
         {
             var customer = await GetById(id);
-            customer.CustomerName = customerDTO.CustomerName;
-            customer.Contact = customerDTO.Contact;
+            customer.UserName = customerDTO.CustomerName;
+            customer.PhoneNumber = customerDTO.Contact;
 
             UpdateDB(customer);
-            Save();
+            await Save();
             return;
         }
     }

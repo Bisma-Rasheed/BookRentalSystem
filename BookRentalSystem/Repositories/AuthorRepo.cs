@@ -1,8 +1,8 @@
 ﻿using BookRentalSystem.Data;
-using BookRentalSystem.DTO;
 using BookRentalSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using BookRentalSystem.Repositories.IRepositories;
+using BookRentalSystem.Models.DTO.ModelDTOs;
 
 namespace BookRentalSystem.Repositories
 {
@@ -20,6 +20,12 @@ namespace BookRentalSystem.Repositories
             _dbSet.Add(author);
             await Save();
             return author;
+        }
+
+        public async Task<Author> GetByName(string name)
+        {
+            Author? author =  _dbSet.Where(a=>a.Name==name).FirstOrDefault();
+            return author!;
         }
 
         public async Task UpdateAuthor(int id, AuthorDTO authorDTO)

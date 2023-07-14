@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BookRentalSystem.DTO
+namespace BookRentalSystem.Models.DTO.ModelDTOs
 {
     public class RentalDTO
     {
         [Required]
         public int BookID { get; set; }
         [Required]
-        public int CustomerID { get; set; }
-
+        public string? CustomerID { get; set; }
         [Required, DataType(DataType.Date)]
         public DateTime RentalDate { get; set; }
         [Required, DataType(DataType.Date)]
