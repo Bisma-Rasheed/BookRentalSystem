@@ -20,6 +20,24 @@ namespace BookRentalSystem.Services
             _authorsService = authorsService;
             _bookAuthorsService = bookAuthorsService;
         }
+
+        public new async Task<IEnumerable<BookDTO>> GetAllItems()
+        {
+            var books = await _unitOfWork.BookRepository.GetAll();
+            List<BookDTO> bookDTO = new();
+            foreach(var book in books)
+            {
+                bookDTO.Add(new BookDTO
+                {
+                    Title = book.Title!,
+                    Description = book.Description!,
+                    isAvailable = book.isAvailable!,
+                    RentalPrice = book.RentalPrice,
+                    Quantity = book.Quantity
+                });
+            }
+            return bookDTO;
+        }
         public async Task<Book> AddBook(BookInfoDTO bookInfoDTO)
         {
             if (bookInfoDTO.Quantity <= 0) bookInfoDTO.isAvailable = "No";

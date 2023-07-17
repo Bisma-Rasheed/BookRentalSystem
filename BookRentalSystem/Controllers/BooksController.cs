@@ -23,7 +23,7 @@ namespace BookRentalSystem.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetAllBooks()
+        public async Task<ActionResult<IEnumerable<BookDTO>>> GetAllBooks()
         {
             if (!_service.IfTableExists())
             {
