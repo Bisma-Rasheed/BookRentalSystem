@@ -7,10 +7,12 @@ using BookRentalSystem.Models.ErrorHandling;
 using Microsoft.AspNetCore.Authorization;
 using BookRentalSystem.Models.DTO.ModelDTOs;
 using BookRentalSystem.Models.DTO.ViewModelDTOs;
+using Microsoft.AspNetCore.Cors;
 
 namespace BookRentalSystem.Controllers
 {
     //[Authorize(Roles = "Admin")]
+    [EnableCors]
     [Route("api/[controller]")]
     [ApiController]
     public class BooksController : ControllerBase
@@ -44,7 +46,7 @@ namespace BookRentalSystem.Controllers
 
         [HttpGet]
         [Route("/AvailableBooks")]
-        public async Task<ActionResult<IEnumerable<Book>>> AvailableBooks()
+        public async Task<ActionResult<IEnumerable<BookDTO>>> AvailableBooks()
         {
             if (!_service.IfTableExists())
             {

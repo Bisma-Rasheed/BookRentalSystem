@@ -114,7 +114,7 @@ namespace BookRentalSystem.Controllers
 
         private JwtSecurityToken GenerateToken(List<Claim> authClaims)
         {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]!));
 
             var token = new JwtSecurityToken(
                     issuer: _configuration["JWT:ValidIssuer"],

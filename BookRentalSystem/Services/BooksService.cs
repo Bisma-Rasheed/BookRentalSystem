@@ -102,9 +102,22 @@ namespace BookRentalSystem.Services
             return await _unitOfWork.BookRepository.GetByName(name);
         }
 
-        public async Task<IEnumerable<Book>> GetAvailableBooks()
+        public async Task<IEnumerable<BookDTO>> GetAvailableBooks()
         {
-            return await _unitOfWork.BookRepository.GetAvailableBooks();
+            var books =  await _unitOfWork.BookRepository.GetAvailableBooks();
+            List<BookDTO> bookDTO = new();
+            foreach (var book in books)
+            {
+                bookDTO.Add(new BookDTO
+                {
+                    Title = book.Title!,
+                    Description = book.Description!,
+                    isAvailable = book.isAvailable!,
+                    RentalPrice = book.RentalPrice,
+                    Quantity = book.Quantity
+                });
+            }
+            return bookDTO;
         }
 
         public async Task UpdateBook(int id, BookUpdateDTO bookUpdateDTO)

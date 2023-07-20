@@ -11,7 +11,7 @@ namespace BookRentalSystem.Services.IServices
         Task<Book> AddBook(BookInfoDTO bookInfoDTO);
         Task UpdateBook(int id, BookUpdateDTO bookUpdateDTO);
         Task<Book> GetBookByName(string name);
-        Task<IEnumerable<Book>> GetAvailableBooks();
+        Task<IEnumerable<BookDTO>> GetAvailableBooks();
     }
 
 }
