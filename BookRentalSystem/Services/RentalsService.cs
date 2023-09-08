@@ -23,7 +23,7 @@ namespace BookRentalSystem.Services
         {
             await _unitOfWork.RentalRepository.UpdateRentalInfo(id, rentalDTO);
             return;
-        }  
+        }
 
         public async Task<IEnumerable<Rental>> GetRentalsByCustomer(string id)
         {

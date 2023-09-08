@@ -16,6 +16,7 @@ namespace BookRentalSystem.Controllers
     
     public class AuthenticationController : ControllerBase
     {
+       
         private readonly UserManager<Customer> _userManager;
         private readonly IConfiguration _configuration;
 
