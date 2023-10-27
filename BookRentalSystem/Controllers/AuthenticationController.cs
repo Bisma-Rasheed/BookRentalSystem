@@ -7,6 +7,8 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using BookRentalSystem.Services.IServices;
+using BookRentalSystem.Models.EmailConfig;
 
 namespace BookRentalSystem.Controllers
 {
@@ -19,11 +21,25 @@ namespace BookRentalSystem.Controllers
        
         private readonly UserManager<Customer> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
-        public AuthenticationController(UserManager<Customer> userManager, IConfiguration configuration)
+        public AuthenticationController(UserManager<Customer> userManager, IConfiguration configuration, IEmailService emailService)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _emailService = emailService;
+        }
+
+        [HttpGet]
+        public IActionResult TestEmail()
+        {
+            var message = new Message(new string[] 
+                {"bismahrasheed96@gmail.com"}, "Test Email", "Sending test Email");
+
+            _emailService.SendEmail(message);
+
+            return StatusCode(StatusCodes.Status200OK,
+                new Response { Status = "Success", Message = "Email sent successfully", Reason = "-" });
         }
 
         [HttpPost]

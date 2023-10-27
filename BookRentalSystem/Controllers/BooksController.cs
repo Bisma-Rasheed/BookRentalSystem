@@ -27,12 +27,7 @@ namespace BookRentalSystem.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookDTO>>> GetAllBooks()
         {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"Book\" is null." });
-            }
-
+            
             try
             {
                 return Ok(await _service.GetAllItems());
@@ -48,12 +43,7 @@ namespace BookRentalSystem.Controllers
         [Route("/AvailableBooks")]
         public async Task<ActionResult<IEnumerable<BookDTO>>> AvailableBooks()
         {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"Book\" is null." });
-            }
-
+            
             try
             {
                 return Ok(await _service.GetAvailableBooks());
@@ -70,12 +60,6 @@ namespace BookRentalSystem.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"Book\" is null." });
-            }
-
             if (!await _service.IfExists(id))
             {
                 return StatusCode(StatusCodes.Status404NotFound,
@@ -95,19 +79,12 @@ namespace BookRentalSystem.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<BookDTO>> AddBookInfo([FromBody] BookInfoDTO bookInfoDTO)
+        public async Task<ActionResult<BookDTO>> AddBookInfo(BookInfoDTO bookInfoDTO)
         {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"Book\" is null." });
-            }
-
             try
             {
                 var book = await _service.AddBook(bookInfoDTO);
-
-                return CreatedAtAction("GetBook", new { id = book.BookID }, bookInfoDTO);
+                return CreatedAtAction("GetBook", new {id = book.BookID }, bookInfoDTO);
             }
             catch(Exception ex)
             {
@@ -121,12 +98,7 @@ namespace BookRentalSystem.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] BookUpdateDTO bookUpdateDTO)
         {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"Book\" is null." });
-            }
-
+           
             if (!await _service.IfExists(id))
             {
                 return StatusCode(StatusCodes.Status404NotFound,
@@ -152,12 +124,7 @@ namespace BookRentalSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            if (!_service.IfTableExists())
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "The entity set \"Book\" is null." });
-            }
-
+           
             if (!await _service.IfExists(id))
             {
                 return StatusCode(StatusCodes.Status404NotFound,

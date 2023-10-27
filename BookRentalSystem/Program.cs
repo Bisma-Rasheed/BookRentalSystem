@@ -1,4 +1,7 @@
 using BookRentalSystem;
+using BookRentalSystem.Models.EmailConfig;
+using BookRentalSystem.Services;
+using BookRentalSystem.Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +28,12 @@ AuthenticationConfigurator.ConfigureAuthentication(builder.Services, builder.Con
 //Add cors
 CrossOriginConfiguration.CorsConfig(builder.Services);
 
+
+//Add email config
+var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
+builder.Services.AddSingleton(emailConfig);
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
